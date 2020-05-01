@@ -1,16 +1,18 @@
 import { ConnectionManager } from 'typeorm';
 import { databaseName } from '../Config';
 
-import { Users } from '../Models/UserDataModel';
+import { UserDataModel } from '../Models/UserDataModel';
+import { TaskDataModel } from '../Models/TaskDataModel';
 
 
 const connectionManager: ConnectionManager = new ConnectionManager();
 connectionManager.create({
     name: databaseName,
     type: 'sqlite',
-    database: '../Data/db.sqlite',
+    database: '../data/db.sqlite',
     entities: [
-        Users
+        UserDataModel,
+        TaskDataModel
     ]
 });
 

@@ -2,7 +2,7 @@ import { Command } from 'discord-akairo';
 import { Message } from 'discord.js';
 import { Repository } from 'typeorm';
 
-import { Users } from '../../../Models/UserDataModel';
+import { UserDataModel } from '../../../Models/UserDataModel';
 import TrelloHelper from '../../../Helpers/TrelloHelper';
 
 export default class TrelloSynchronizateUserCommand extends Command {
@@ -15,7 +15,7 @@ export default class TrelloSynchronizateUserCommand extends Command {
                 examples: ['synchronizuj'],
                 usage: 'synchronizuj'
             },
-            cooldown: 120000,
+            // cooldown: 120000,
             // ratelimit: 2,
         });
     }
@@ -23,36 +23,23 @@ export default class TrelloSynchronizateUserCommand extends Command {
     // TODO: Pobrawić ten kod jakoś, żeby synchronizate się nie powtarzał bo przeokropnie to wygląda
     public async exec(message: Message) {
         const discordUserId: string = message.author.id;
-        const userRepo: Repository<Users> = this.client.db.getRepository(Users);
+        const userRepo: Repository<UserDataModel> = this.client.db.getRepository(UserDataModel);
 
         const developer = await userRepo.findOne({ userId: discordUserId });
         
-        if(developer === undefined) {
-
+        if(developer !== undefined) {
+            if(developer.trelloListId !== undefined && developer.trelloListId !== '') {
+                return message.util.reply('❌ Twoje konto jest już zsynchronizowane z kartą na trello!');
+            }
             await this.synchronizateTrello(message, discordUserId, userRepo, developer);
 
         } else {
-
-            if(developer.trelloCardId !== undefined && developer.trelloCardId !== '') {
-                return message.util.reply('❌ Twoje konto jest już zsynchronizowane z kartą na trello!');
-            }
-
             await this.synchronizateTrello(message, discordUserId, userRepo, developer);
         }
 
-        
-
-        // if(developer == undefined) {
-        //     await this.synchronizateTrello(message, discordUserId, userRepo, developer);
-        // } else if(developer.trelloCardId !== undefined && developer.trelloCardId !== '') {
-        //     return message.util.reply('❌ Twoje konto jest już zsynchronizowane z kartą na trello!');
-        // } else {
-        //     await this.synchronizateTrello(message, discordUserId, userRepo, developer);
-        // }
-
     }
 
-    public async synchronizateTrello(message: Message, discordUserId: string, userRepo: Repository<Users>, developer: Users) {
+    public async synchronizateTrello(message: Message, discordUserId: string, userRepo: Repository<UserDataModel>, developer: UserDataModel) {
 
         await TrelloHelper.createUserList(discordUserId).then(async (res: any) => {
             await TrelloHelper.isUserDiscordHaveList(discordUserId).then(async (listId: string) => {
@@ -64,11 +51,10 @@ export default class TrelloSynchronizateUserCommand extends Command {
                 if(developer === undefined) {
                     await userRepo.insert({
                         userId: discordUserId,
-                        trelloCardId: listId
+                        trelloListId: listId
                     });
                 } else {
-                    developer.trelloCardId = listId;
-
+                    developer.trelloListId = listId;
                     await userRepo.save(developer);
                 }
 

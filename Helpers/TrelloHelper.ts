@@ -10,7 +10,6 @@ export default class TrelloHelper {
 
         await getTrelloBoardLists(trelloBoardId).then((lists: TrelloListModel[]) => {
             for(let list of lists) {
-                console.log(`${list.name} [${userId === list.name}]`);
                 if (userId === list.name) {
                     valueToReturn = list.id;
                     break;
@@ -20,7 +19,6 @@ export default class TrelloHelper {
                 }
             }
         });
-        console.log(`valueToReturn ${valueToReturn}`);
         return valueToReturn;
     }
 
