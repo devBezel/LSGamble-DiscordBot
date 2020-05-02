@@ -11,6 +11,6 @@ export default class ReadyListener extends Listener {
 
     public exec(): void {
 
-        console.log(`✔ ${this.client.user.tag} został włączony pomyślnie!`);
+        console.log(`✅ ${this.client.user.tag} został włączony pomyślnie!`);
     }
 }

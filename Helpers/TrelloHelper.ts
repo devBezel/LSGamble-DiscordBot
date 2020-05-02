@@ -1,4 +1,4 @@
-import { getTrelloBoardLists, createTrelloList, createTrelloCardForList } from '../Modules/TrelloModule';
+import { getTrelloBoardLists, createTrelloList, createTrelloCardForList, deleteTrelloCardFromList } from '../Modules/TrelloModule';
 import { trelloBoardId } from '../Config'
 import { TrelloListModel } from '../Models/TrelloListModel';
 
@@ -34,6 +34,15 @@ export default class TrelloHelper {
     public static async createCardForUserList(trelloListId: string, sender: string, task: string) {
         let response;
         await createTrelloCardForList(trelloListId, sender, task).then((res: any) => {
+            response = res;
+        });
+
+        return response;
+    }
+
+    public static async deleteCardForUserList(cardId: string) {
+        let response;
+        await deleteTrelloCardFromList(cardId).then((res: any) => {
             response = res;
         });
 

@@ -11,4 +11,7 @@ export class UserDataModel {
     @Column({ type: 'varchar', length: 32 })
     trelloListId: string;
 
+    @Column({ type: 'int', nullable: true })
+    coins: number;
+
 }

@@ -75,10 +75,14 @@ export const createTrelloCardForList = async (listId: string, content: string, d
     return response;
 };
 
-// export const getCardsFromListRequest = async (listId: string) => {
-//     trello.setApiKey('0d62ed37fd938f7c0663cdb46dac5dbe');
-//     trello.setOauthToken('39131d2a0e9e7a93848a11f0d355d023e644f6f045db79857d91722ae9609453');
+export const deleteTrelloCardFromList = async (cardId: string) => {
+    trello.setApiKey(trelloApiKey);
+    trello.setOauthToken(trelloOAuthToken);
 
-//     let res;
-//     await trello.list.(listId)
-// }
+    let response;
+    await trello.card.del(cardId).then((res: any) => {
+        res = response;
+    }, error => {
+        console.log(error);
+    });
+};

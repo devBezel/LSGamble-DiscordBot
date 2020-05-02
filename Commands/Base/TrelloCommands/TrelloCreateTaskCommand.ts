@@ -42,6 +42,8 @@ export default class TrelloCreateTaskCommand extends Command {
 
         const developer = await userRepo.findOne({ userId: member.id });
 
+        await message.delete();
+
         if (developer != undefined) {
             if (developer.trelloListId == undefined) {
                 return message.util.reply('Ta osoba nie ma zsynchronizowanej listy, przekaż zadanie innej');
@@ -49,18 +51,16 @@ export default class TrelloCreateTaskCommand extends Command {
 
             await TrelloHelper.createCardForUserList(developer.trelloListId, `${message.author.tag} (${message.author.id})`, `**Zadanie:** \n ${task}`).then(async (res: any) => {
 
-                // TODO: Na podstawie res.id zrobić nowy task i wlączyć w to użytkownika sendera i resolvera który rozwiązał zadanie (sender otrzymuje punkt za wykonane zadanie)
-
                 await taskRepo.insert({
                     getterId: developer.userId,
                     senderId: message.author.id,
+                    text: task,
                     trelloListId: developer.trelloListId,
                     trelloCardId: res.id,
                     isEnded: false
                 })
 
                 message.util.reply(`✅ Utworzyłeś zadanie dla ${member.displayName}! Jeśli twoje zadanie okaże się przydatne - otrzymasz punkty lojalnościowe`);
-                console.log(`Utworzono card ${res.id}`);
             });
         } else {
             return message.util.reply('Ta osoba nie ma zsynchronizowanej listy, przekaż zadanie innej');
