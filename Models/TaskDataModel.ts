@@ -14,11 +14,11 @@ export class TaskDataModel {
     @Column({ type: 'varchar', length: 255 })
     text: string;
 
-    @Column({ type: 'varchar', length: 32 })
-    trelloListId: string;
+    // @Column({ type: 'varchar', length: 32 })
+    // trelloListId: string;
 
-    @Column({ type: 'varchar', length: 32 })
-    trelloCardId: string;
+    // @Column({ type: 'varchar', length: 32 })
+    // trelloCardId: string;
 
     @Column({ type: 'boolean' })
     isEnded: boolean;

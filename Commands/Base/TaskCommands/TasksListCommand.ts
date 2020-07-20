@@ -1,17 +1,16 @@
 import { Command } from 'discord-akairo';
 import { Message } from 'discord.js';
-import { listRequest, getTrelloBoardLists, createTrelloList } from '../../../Modules/TrelloModule';
-import TrelloHelper from '../../../Helpers/TrelloHelper';
 import { trelloBoardId } from '../../../Config'
 import { Repository } from 'typeorm';
 import { TaskDataModel } from '../../../Models/TaskDataModel';
 import { MessageEmbed } from 'discord.js';
+import { EmbedColors } from '../../../Constants/EmbedColors';
 
 export default class TrelloTasksListCommand extends Command {
     constructor() {
         super('zadania', {
             aliases: ['zadania', 'taski', 'bledy'],
-            category: 'Trello',
+            category: 'Task',
             description: {
                 content: 'Pokazuje zadania trello',
                 examples: ['zadania'],
@@ -39,7 +38,7 @@ export default class TrelloTasksListCommand extends Command {
 
         const taskEmbed = new MessageEmbed()
             .setAuthor('Twoje zadania')
-            .setColor('#208c34');
+            .setColor(EmbedColors.Normal);
 
         for(let i = 0; i < userTasks.length; i++) {
             taskEmbed.addField(`Zadanie [ID: ${userTasks[i].id}]`, `Dla ${userTasks[i].text}`, false);

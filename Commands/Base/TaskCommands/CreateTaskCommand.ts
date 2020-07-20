@@ -3,14 +3,14 @@ import { Message } from "discord.js";
 import { GuildMember } from "discord.js";
 import { Repository } from "typeorm";
 import { UserDataModel } from "../../../Models/UserDataModel";
-import TrelloHelper from "../../../Helpers/TrelloHelper";
 import { TaskDataModel } from "../../../Models/TaskDataModel";
+import { MessageEmbed } from "discord.js";
 
 export default class TrelloCreateTaskCommand extends Command {
     constructor() {
         super('blad', {
-            aliases: ['blad', 'bug', 'zadanie', 'task'],
-            category: 'Trello',
+            aliases: ['bug', 'zadanie', 'task'],
+            category: 'Task',
             description: {
                 content: 'Zglasza bląd do konkretnego użytkownika na trello',
                 examples: ['blad @Algorytm jakis przykladowy blad'],
@@ -44,27 +44,31 @@ export default class TrelloCreateTaskCommand extends Command {
 
         await message.delete();
 
+        const embed = new MessageEmbed()
+            .setAuthor(`Tworzenie zadania dla ${member.user.tag} ...`);
+
+        const msgEmbed: Message = await message.channel.send(embed);
+
         if (developer != undefined) {
-            if (developer.trelloListId == undefined) {
-                return message.util.reply('Ta osoba nie ma zsynchronizowanej listy, przekaż zadanie innej');
-            }
 
-            await TrelloHelper.createCardForUserList(developer.trelloListId, `${message.author.tag} (${message.author.id})`, `**Zadanie:** \n ${task}`).then(async (res: any) => {
+            await taskRepo.insert({
+                getterId: developer.userId,
+                senderId: message.author.id,
+                text: task,
+                isEnded: false
+            })
+            embed.setAuthor(`✅ Utworzyłeś zadanie dla ${member.displayName}! Jeśli twoje zadanie okaże się przydatne - otrzymasz punkty lojalnościowe`);
 
-                await taskRepo.insert({
-                    getterId: developer.userId,
-                    senderId: message.author.id,
-                    text: task,
-                    trelloListId: developer.trelloListId,
-                    trelloCardId: res.id,
-                    isEnded: false
-                })
+            await msgEmbed.edit(embed);
 
-                message.util.reply(`✅ Utworzyłeś zadanie dla ${member.displayName}! Jeśli twoje zadanie okaże się przydatne - otrzymasz punkty lojalnościowe`);
-            });
         } else {
-            return message.util.reply('Ta osoba nie ma zsynchronizowanej listy, przekaż zadanie innej');
+            embed.setAuthor('Ta osoba nie ma zsynchronizowanej listy, przekaż zadanie innej');
+            await msgEmbed.edit(embed);
         }
+
+        setTimeout(async () => {
+            await msgEmbed.delete();
+        }, 6000);
     }
 
 }

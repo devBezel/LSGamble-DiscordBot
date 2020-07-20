@@ -3,13 +3,13 @@ import { Message } from 'discord.js';
 import { TaskDataModel } from '../../../Models/TaskDataModel';
 import { MessageEmbed } from 'discord.js';
 import { UserDataModel } from '../../../Models/UserDataModel';
-import TrelloHelper from '../../../Helpers/TrelloHelper';
+import { EmbedColors } from '../../../Constants/EmbedColors';
 
 export default class TrelloEndTaskCommand extends Command {
     constructor() {
         super('zakoncz', {
             aliases: ['taskend', 'ukoncz'],
-            category: 'Trello',
+            category: 'Task',
             description: {
                 content: 'Koniec zadania w karcie od trello',
                 examples: ['zakoncz [id zadania]'],
@@ -51,13 +51,12 @@ export default class TrelloEndTaskCommand extends Command {
         if(userForCoin == undefined) {
             await userRepo.insert({
                 userId: taskToEnd.senderId,
-                trelloListId: ''
             });
         }
 
         const embed = new MessageEmbed()
             .setAuthor('Czy ten błąd/zadanie było pomocne?')
-            .setColor('#208c34')
+            .setColor(EmbedColors.Normal)
             .setFooter('Zaznacz tak lub nie!');
 
         const msgEmbed: Message = await message.channel.send(embed);
@@ -93,9 +92,6 @@ export default class TrelloEndTaskCommand extends Command {
         })
 
         
-        
-        // Usuwanie zadanie z bazy trello
-        await TrelloHelper.deleteCardForUserList(taskToEnd.trelloCardId);
 
         // Usuwanie zadanie z bazy danych
         taskToEnd.isEnded = true;
